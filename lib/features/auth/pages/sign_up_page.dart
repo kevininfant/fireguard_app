@@ -48,13 +48,13 @@ class _SignUpPageState extends State<SignUpPage> {
         return;
       }
       context.read<AuthBloc>().add(
-            AuthSignUpRequested(
-              fullName: _fullNameController.text.trim(),
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              role: role,
-            ),
-          );
+        AuthSignUpRequested(
+          fullName: _fullNameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          role: role,
+        ),
+      );
     }
   }
 
@@ -64,7 +64,8 @@ class _SignUpPageState extends State<SignUpPage> {
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
           Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
@@ -83,30 +84,43 @@ class _SignUpPageState extends State<SignUpPage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.industrialOrange),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: AppColors.industrialOrange,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 440),
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.surfaceContainerHighest),
+                      border: Border.all(
+                        color: AppColors.surfaceContainerHighest,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 24,
+                            horizontal: 20,
+                          ),
                           decoration: const BoxDecoration(
                             color: AppColors.surfaceContainerLow,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -118,7 +132,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                   color: AppColors.surfaceContainer,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: AppColors.industrialOrange.withValues(alpha: 0.5),
+                                    color: AppColors.industrialOrange
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Image.network(
@@ -162,7 +177,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 RoleSelectorCard(
                                   selectedRole: selectedRole,
                                   onRoleSelected: (role) {
-                                    context.read<AuthBloc>().add(AuthRoleChanged(role));
+                                    context.read<AuthBloc>().add(
+                                      AuthRoleChanged(role),
+                                    );
                                   },
                                 ),
                                 const SizedBox(height: 16),
@@ -171,7 +188,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                   label: 'Full Name / Officer Title',
                                   hintText: 'e.g. Alex Rivera',
                                   prefixIcon: Icons.person_outline,
-                                  validator: (v) => Validators.validateNotEmpty(v, 'Full Name'),
+                                  validator: (v) => Validators.validateNotEmpty(
+                                    v,
+                                    'Full Name',
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 CustomTextField(
@@ -191,7 +211,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                   obscureText: _obscurePassword,
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                       color: AppColors.onSurfaceVariantText,
                                       size: 20,
                                     ),
@@ -210,28 +232,24 @@ class _SignUpPageState extends State<SignUpPage> {
                                   hintText: 'Repeat passcode',
                                   prefixIcon: Icons.lock_outline,
                                   obscureText: _obscurePassword,
-                                  validator: (v) => Validators.validateNotEmpty(v, 'Confirm Password'),
+                                  validator: (v) => Validators.validateNotEmpty(
+                                    v,
+                                    'Confirm Password',
+                                  ),
                                 ),
                                 const SizedBox(height: 24),
                                 CommonButton(
                                   text: 'CREATE CLEARANCE ACCOUNT',
                                   isLoading: isLoading,
                                   icon: Icons.person_add,
-                                  onPressed: () => _onSignUp(context, selectedRole),
+                                  onPressed: () =>
+                                      _onSignUp(context, selectedRole),
                                 ),
                                 const SizedBox(height: 16),
                                 SsoButton(
                                   text: 'REGISTER WITH GOOGLE SSO',
-                                  onPressed: () {
-                                    context.read<AuthBloc>().add(
-                                          AuthSignUpRequested(
-                                            fullName: 'Alex Rivera',
-                                            email: 'inspector@fireguard.org',
-                                            password: 'password123',
-                                            role: selectedRole,
-                                          ),
-                                        );
-                                  },
+                                  onPressed: () =>
+                                      _onSignUp(context, selectedRole),
                                 ),
                                 const SizedBox(height: 20),
                                 Row(

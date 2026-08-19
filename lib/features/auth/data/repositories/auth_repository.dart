@@ -5,7 +5,7 @@ class AuthRepository {
   final AuthService _authService;
 
   AuthRepository({AuthService? authService})
-      : _authService = authService ?? AuthService();
+    : _authService = authService ?? AuthService();
 
   Future<User?> getCurrentUser() async {
     return await _authService.getSavedUser();
@@ -17,19 +17,20 @@ class AuthRepository {
     required String role,
     String? displayName,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 600)); // Simulate auth handshake
-    final user = User(
-      uid: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-      email: email.isNotEmpty ? email : 'inspector@fireguard.org',
-      displayName: displayName?.isNotEmpty == true ? displayName! : 'Lead Inspector',
-      role: role.isNotEmpty ? role : 'EHS Manager',
-      points: 1250,
-      currentLevel: 3,
-      streakDays: 5,
-      badges: const ['Fire Inspector Level 1'],
-      unlockedCoupons: const ['GRAINGER-20'],
-      bookmarkedQuestions: const ['q_1_1'],
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final user = await _authService.getAccountUser(email);
+    if (user == null) {
+      throw Exception(
+        'No account found for this email. Please register first.',
+      );
+    }
+
+    final isPasswordValid = await _authService.isValidPassword(email, password);
+    if (!isPasswordValid) {
+      throw Exception('Invalid email or passcode.');
+    }
+
     await _authService.saveUser(user);
     return user;
   }
@@ -41,9 +42,17 @@ class AuthRepository {
     required String role,
   }) async {
     await Future.delayed(const Duration(milliseconds: 700));
+    final normalizedEmail = email.trim().toLowerCase();
+    final accountExists = await _authService.hasAccount(normalizedEmail);
+    if (accountExists) {
+      throw Exception(
+        'An account already exists for this email. Please sign in.',
+      );
+    }
+
     final user = User(
       uid: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-      email: email,
+      email: normalizedEmail,
       displayName: fullName,
       role: role,
       points: 500, // Welcome bonus points
@@ -53,12 +62,17 @@ class AuthRepository {
       unlockedCoupons: const [],
       bookmarkedQuestions: const [],
     );
+    await _authService.saveAccount(user: user, password: password);
     await _authService.saveUser(user);
     return user;
   }
 
   Future<void> sendPasswordResetOtp(String email) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    final exists = await _authService.hasAccount(email);
+    if (!exists) {
+      throw Exception('No account found for this email.');
+    }
   }
 
   Future<bool> verifyOtp(String email, String code) async {
@@ -68,10 +82,12 @@ class AuthRepository {
 
   Future<void> setNewPassword(String email, String newPassword) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    await _authService.updatePassword(email, newPassword);
   }
 
   Future<void> updateUser(User user) async {
     await _authService.saveUser(user);
+    await _authService.updateAccountUser(user);
   }
 
   Future<void> logout() async {

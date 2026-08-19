@@ -26,6 +26,8 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  bool _hasHandledCompletion = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,24 +37,33 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<QuizBloc, QuizState>(
-      listener: (context, state) {
-        if (state.status == QuizStatus.completed) {
-          // Update dashboard level and user points
-          context.read<DashboardBloc>().add(
-                DashboardLevelCompleted(
-                  levelId: state.levelId,
-                  pointsEarned: state.scorePoints,
-                ),
-              );
-          final user = context.read<AuthBloc>().state.user;
-          if (user != null) {
-            final updatedUser = user.copyWith(
-              points: user.points + state.scorePoints,
-              currentLevel: state.levelId >= user.currentLevel ? state.levelId + 1 : user.currentLevel,
+      listener: (context, state) async {
+        if (state.status == QuizStatus.completed && !_hasHandledCompletion) {
+          _hasHandledCompletion = true;
+          final isPassed = state.accuracyPercent >= 70;
+          if (isPassed) {
+            final dashboardBloc = context.read<DashboardBloc>();
+            final authBloc = context.read<AuthBloc>();
+            dashboardBloc.add(
+              DashboardLevelCompleted(
+                levelId: state.levelId,
+                pointsEarned: state.scorePoints,
+              ),
             );
-            context.read<AuthBloc>().add(AuthUserUpdated(updatedUser));
+
+            final user = authBloc.state.user;
+            if (user != null) {
+              final updatedUser = user.copyWith(
+                points: user.points + state.scorePoints,
+                currentLevel: state.levelId >= user.currentLevel
+                    ? state.levelId + 1
+                    : user.currentLevel,
+              );
+              authBloc.add(AuthUserUpdated(updatedUser));
+            }
           }
 
+          if (!context.mounted) return;
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.quizResults,
@@ -88,7 +99,10 @@ class _QuizPageState extends State<QuizPage> {
           appBar: AppBar(
             backgroundColor: AppColors.surfaceContainerLow,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.onSurfaceVariantText),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: AppColors.onSurfaceVariantText,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
@@ -101,29 +115,39 @@ class _QuizPageState extends State<QuizPage> {
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.auto_awesome, color: AppColors.industrialGold),
+                icon: const Icon(
+                  Icons.auto_awesome,
+                  color: AppColors.industrialGold,
+                ),
                 tooltip: 'Generate AI Questions',
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (_) => AiQuizGeneratorModal(levelId: state.levelId),
+                    builder: (_) =>
+                        AiQuizGeneratorModal(levelId: state.levelId),
                   );
                 },
               ),
               IconButton(
                 icon: Icon(
                   isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                  color: isBookmarked ? AppColors.industrialOrange : AppColors.onSurfaceVariantText,
+                  color: isBookmarked
+                      ? AppColors.industrialOrange
+                      : AppColors.onSurfaceVariantText,
                 ),
                 tooltip: 'Bookmark for study',
                 onPressed: () {
-                  context.read<QuizBloc>().add(QuizBookmarkToggled(question.id));
+                  context.read<QuizBloc>().add(
+                    QuizBookmarkToggled(question.id),
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        isBookmarked ? 'Removed from bookmarks' : 'Bookmarked NFPA question for offline study',
+                        isBookmarked
+                            ? 'Removed from bookmarks'
+                            : 'Bookmarked NFPA question for offline study',
                       ),
                       duration: const Duration(seconds: 1),
                     ),
@@ -139,7 +163,9 @@ class _QuizPageState extends State<QuizPage> {
                 LinearProgressIndicator(
                   value: progress,
                   backgroundColor: AppColors.surfaceContainerHighest,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.industrialOrange),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.industrialOrange,
+                  ),
                   minHeight: 3,
                 ),
 
@@ -174,7 +200,9 @@ class _QuizPageState extends State<QuizPage> {
                           decoration: BoxDecoration(
                             color: AppColors.surfaceContainerHigh,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.surfaceContainerHighest),
+                            border: Border.all(
+                              color: AppColors.surfaceContainerHighest,
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,12 +228,16 @@ class _QuizPageState extends State<QuizPage> {
                                   );
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.surfaceContainerLow,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: AppColors.industrialGold.withValues(alpha: 0.5),
+                                      color: AppColors.industrialGold
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: Row(
@@ -247,20 +279,23 @@ class _QuizPageState extends State<QuizPage> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: question.options.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
                           itemBuilder: (context, optIdx) {
                             final isSelected = selectedOption == optIdx;
                             return OptionCard(
-                              label: optIdx < optionLabels.length ? optionLabels[optIdx] : '${optIdx + 1}',
+                              label: optIdx < optionLabels.length
+                                  ? optionLabels[optIdx]
+                                  : '${optIdx + 1}',
                               text: question.options[optIdx],
                               isSelected: isSelected,
                               onSelect: () {
                                 context.read<QuizBloc>().add(
-                                      QuizAnswerSelected(
-                                        questionIndex: currentIndex,
-                                        optionIndex: optIdx,
-                                      ),
-                                    );
+                                  QuizAnswerSelected(
+                                    questionIndex: currentIndex,
+                                    optionIndex: optIdx,
+                                  ),
+                                );
                               },
                             );
                           },
@@ -275,7 +310,9 @@ class _QuizPageState extends State<QuizPage> {
                           icon: Icons.arrow_forward,
                           onPressed: selectedOption != null
                               ? () {
-                                  context.read<QuizBloc>().add(QuizNextQuestionRequested());
+                                  context.read<QuizBloc>().add(
+                                    QuizNextQuestionRequested(),
+                                  );
                                 }
                               : null,
                         ),

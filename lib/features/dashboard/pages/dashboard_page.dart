@@ -7,6 +7,7 @@ import 'package:fireguard_app/features/auth/bloc/auth_state.dart';
 import 'package:fireguard_app/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:fireguard_app/features/dashboard/bloc/dashboard_event.dart';
 import 'package:fireguard_app/features/dashboard/bloc/dashboard_state.dart';
+import 'package:fireguard_app/features/dashboard/data/models/level_model.dart';
 import 'package:fireguard_app/features/dashboard/widgets/stats_row_card.dart';
 import 'package:fireguard_app/features/dashboard/widgets/daily_challenge_card.dart';
 import 'package:fireguard_app/features/dashboard/widgets/level_map_card.dart';
@@ -28,7 +29,14 @@ class DashboardPage extends StatelessWidget {
               return const LoadingView(message: 'Loading Safety Modules...');
             }
 
-            final levels = dashboardState.levels;
+            final levels = _levelsForUserProgress(
+              dashboardState.levels,
+              user?.currentLevel,
+            );
+            final drillLevel =
+                levels.where((level) => level.isActive).firstOrNull ??
+                levels.where((level) => !level.isLocked).lastOrNull ??
+                levels.firstOrNull;
 
             return RefreshIndicator(
               onRefresh: () async {
@@ -37,7 +45,10 @@ class DashboardPage extends StatelessWidget {
               color: AppColors.industrialOrange,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -46,16 +57,18 @@ class DashboardPage extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Daily Challenge
-                    DailyChallengeCard(
-                      onStartDrill: () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.quiz,
-                          arguments: 3, // Level 3 drill
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
+                    if (drillLevel != null) ...[
+                      DailyChallengeCard(
+                        onStartDrill: () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.quiz,
+                            arguments: drillLevel.levelId,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                    ],
 
                     // Safety Certification Path Header
                     Row(
@@ -86,12 +99,13 @@ class DashboardPage extends StatelessWidget {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.72,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.72,
+                          ),
                       itemCount: levels.length,
                       itemBuilder: (context, index) {
                         final level = levels[index];
@@ -116,5 +130,26 @@ class DashboardPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  List<LevelModel> _levelsForUserProgress(
+    List<LevelModel> levels,
+    int? currentLevel,
+  ) {
+    if (currentLevel == null || levels.isEmpty) return levels;
+
+    final maxLevel = levels
+        .map((level) => level.levelNumber)
+        .reduce((currentMax, level) => level > currentMax ? level : currentMax);
+
+    return levels.map((level) {
+      if (currentLevel > maxLevel || level.levelNumber < currentLevel) {
+        return level.copyWith(status: 'COMPLETED');
+      }
+      if (level.levelNumber == currentLevel) {
+        return level.copyWith(status: 'ACTIVE');
+      }
+      return level.copyWith(status: 'LOCKED');
+    }).toList();
   }
 }

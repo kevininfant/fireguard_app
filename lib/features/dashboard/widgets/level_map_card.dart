@@ -6,11 +6,7 @@ class LevelMapCard extends StatelessWidget {
   final LevelModel level;
   final VoidCallback onClick;
 
-  const LevelMapCard({
-    super.key,
-    required this.level,
-    required this.onClick,
-  });
+  const LevelMapCard({super.key, required this.level, required this.onClick});
 
   @override
   Widget build(BuildContext context) {
@@ -20,31 +16,41 @@ class LevelMapCard extends StatelessWidget {
 
     final borderColor = isActive
         ? AppColors.industrialGold
-        : (isCompleted ? AppColors.industrialOrange : AppColors.surfaceContainerHighest);
+        : (isCompleted
+              ? AppColors.industrialOrange
+              : AppColors.surfaceContainerHighest);
 
     final containerColor = isActive || isCompleted
         ? AppColors.surfaceContainer
         : AppColors.surfaceContainerLow;
 
     return GestureDetector(
-      onTap: isLocked ? null : onClick,
+      onTap: isLocked
+          ? () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Complete the active level to unlock this drill.',
+                  ),
+                  backgroundColor: AppColors.surfaceContainerHighest,
+                ),
+              );
+            }
+          : onClick,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
         decoration: BoxDecoration(
           color: containerColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: borderColor,
-            width: isActive ? 2.0 : 1.0,
-          ),
+          border: Border.all(color: borderColor, width: isActive ? 2.0 : 1.0),
           boxShadow: isActive
               ? [
                   BoxShadow(
                     color: AppColors.industrialGold.withValues(alpha: 0.2),
                     blurRadius: 10,
                     spreadRadius: 1,
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -59,11 +65,15 @@ class LevelMapCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: isCompleted
                     ? AppColors.industrialOrange
-                    : (isActive ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLowest),
+                    : (isActive
+                          ? AppColors.surfaceContainerHigh
+                          : AppColors.surfaceContainerLowest),
                 border: Border.all(
                   color: isCompleted
                       ? AppColors.industrialOrange
-                      : (isActive ? AppColors.industrialGold : AppColors.surfaceContainerHighest),
+                      : (isActive
+                            ? AppColors.industrialGold
+                            : AppColors.surfaceContainerHighest),
                   width: 1.5,
                 ),
               ),
@@ -73,7 +83,9 @@ class LevelMapCard extends StatelessWidget {
                     : (isActive ? Icons.local_fire_department : Icons.lock),
                 color: isCompleted
                     ? AppColors.onIndustrialOrange
-                    : (isActive ? AppColors.industrialGold : AppColors.textMuted),
+                    : (isActive
+                          ? AppColors.industrialGold
+                          : AppColors.textMuted),
                 size: 24,
               ),
             ),
@@ -99,7 +111,9 @@ class LevelMapCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10,
-                color: isLocked ? AppColors.textMuted : AppColors.onSurfaceVariantText,
+                color: isLocked
+                    ? AppColors.textMuted
+                    : AppColors.onSurfaceVariantText,
               ),
             ),
             const SizedBox(height: 8),
@@ -111,8 +125,8 @@ class LevelMapCard extends StatelessWidget {
                 color: isCompleted
                     ? AppColors.industrialOrange.withValues(alpha: 0.15)
                     : (isActive
-                        ? AppColors.industrialGold.withValues(alpha: 0.15)
-                        : AppColors.surfaceContainerHighest),
+                          ? AppColors.industrialGold.withValues(alpha: 0.15)
+                          : AppColors.surfaceContainerHighest),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -123,7 +137,9 @@ class LevelMapCard extends StatelessWidget {
                   letterSpacing: 0.5,
                   color: isCompleted
                       ? AppColors.industrialOrange
-                      : (isActive ? AppColors.industrialGold : AppColors.textMuted),
+                      : (isActive
+                            ? AppColors.industrialGold
+                            : AppColors.textMuted),
                 ),
               ),
             ),

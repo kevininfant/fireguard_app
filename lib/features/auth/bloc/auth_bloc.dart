@@ -7,8 +7,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
 
   AuthBloc({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? AuthRepository(),
-        super(const AuthState()) {
+    : _authRepository = authRepository ?? AuthRepository(),
+      super(const AuthState()) {
     on<AuthCheckStatus>(_onCheckStatus);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthSignUpRequested>(_onSignUpRequested);
@@ -28,19 +28,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: user,
-          selectedRole: user.role,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.authenticated,
+            user: user,
+            selectedRole: user.role,
+          ),
+        );
       } else {
         emit(state.copyWith(status: AuthStatus.unauthenticated));
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.unauthenticated,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
@@ -56,16 +60,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         role: event.role,
         displayName: event.displayName,
       );
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-        selectedRole: user.role,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+          selectedRole: user.role,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
@@ -81,23 +89,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
         role: event.role,
       );
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-        selectedRole: user.role,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+          selectedRole: user.role,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
-  void _onRoleChanged(
-    AuthRoleChanged event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onRoleChanged(AuthRoleChanged event, Emitter<AuthState> emit) {
     emit(state.copyWith(selectedRole: event.role));
   }
 
@@ -108,15 +117,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(status: AuthStatus.loading));
     try {
       await _authRepository.sendPasswordResetOtp(event.email);
-      emit(state.copyWith(
-        status: AuthStatus.codeSent,
-        resetEmail: event.email,
-      ));
+      emit(
+        state.copyWith(status: AuthStatus.codeSent, resetEmail: event.email),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
@@ -130,16 +140,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (isValid) {
         emit(state.copyWith(status: AuthStatus.codeVerified));
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'Invalid verification code. Please enter 6 digits.',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Invalid verification code. Please enter 6 digits.',
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
@@ -152,10 +166,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.setNewPassword(event.email, event.newPassword);
       emit(state.copyWith(status: AuthStatus.passwordUpdated));
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _readableError(e),
+        ),
+      );
     }
   }
 
@@ -173,5 +189,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _authRepository.logout();
     emit(const AuthState(status: AuthStatus.unauthenticated));
+  }
+
+  String _readableError(Object error) {
+    return error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
   }
 }

@@ -21,26 +21,26 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'inspector@fireguard.org');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.disposeNavigator();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   void _onLogin(BuildContext context, String role) {
     if (_formKey.currentState?.validate() == true) {
       context.read<AuthBloc>().add(
-            AuthLoginRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              role: role,
-              displayName: 'Lead Inspector',
-            ),
-          );
+        AuthLoginRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          role: role,
+        ),
+      );
     }
   }
 
@@ -50,7 +50,8 @@ class _AuthPageState extends State<AuthPage> {
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
           Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
@@ -68,24 +69,34 @@ class _AuthPageState extends State<AuthPage> {
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 440),
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.surfaceContainerHighest),
+                      border: Border.all(
+                        color: AppColors.surfaceContainerHighest,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Header Container
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 28,
+                            horizontal: 20,
+                          ),
                           decoration: const BoxDecoration(
                             color: AppColors.surfaceContainerLow,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -97,7 +108,8 @@ class _AuthPageState extends State<AuthPage> {
                                   color: AppColors.surfaceContainer,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: AppColors.industrialOrange.withValues(alpha: 0.5),
+                                    color: AppColors.industrialOrange
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Image.network(
@@ -143,7 +155,9 @@ class _AuthPageState extends State<AuthPage> {
                                 RoleSelectorCard(
                                   selectedRole: selectedRole,
                                   onRoleSelected: (role) {
-                                    context.read<AuthBloc>().add(AuthRoleChanged(role));
+                                    context.read<AuthBloc>().add(
+                                      AuthRoleChanged(role),
+                                    );
                                   },
                                 ),
                                 const SizedBox(height: 18),
@@ -164,7 +178,9 @@ class _AuthPageState extends State<AuthPage> {
                                   obscureText: _obscurePassword,
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                       color: AppColors.onSurfaceVariantText,
                                       size: 20,
                                     ),
@@ -181,7 +197,10 @@ class _AuthPageState extends State<AuthPage> {
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {
-                                      Navigator.pushNamed(context, AppRoutes.resetPassword);
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.resetPassword,
+                                      );
                                     },
                                     child: const Text(
                                       'Forgot Clearance Passcode?',
@@ -198,14 +217,17 @@ class _AuthPageState extends State<AuthPage> {
                                   text: 'AUTHORIZE ACCESS',
                                   isLoading: isLoading,
                                   icon: Icons.shield,
-                                  onPressed: () => _onLogin(context, selectedRole),
+                                  onPressed: () =>
+                                      _onLogin(context, selectedRole),
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
                                   children: const [
                                     Expanded(child: Divider()),
                                     Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
                                       child: Text(
                                         'OR',
                                         style: TextStyle(
@@ -220,16 +242,8 @@ class _AuthPageState extends State<AuthPage> {
                                 ),
                                 const SizedBox(height: 16),
                                 SsoButton(
-                                  onPressed: () {
-                                    context.read<AuthBloc>().add(
-                                          AuthLoginRequested(
-                                            email: 'inspector@fireguard.org',
-                                            password: 'password123',
-                                            role: selectedRole,
-                                            displayName: 'Lead Inspector',
-                                          ),
-                                        );
-                                  },
+                                  onPressed: () =>
+                                      _onLogin(context, selectedRole),
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
@@ -244,7 +258,10 @@ class _AuthPageState extends State<AuthPage> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(context, AppRoutes.signUp);
+                                        Navigator.pushNamed(
+                                          context,
+                                          AppRoutes.signUp,
+                                        );
                                       },
                                       child: const Text(
                                         'Register Clearance',
@@ -271,11 +288,5 @@ class _AuthPageState extends State<AuthPage> {
         );
       },
     );
-  }
-}
-
-extension on TextEditingController {
-  void disposeNavigator() {
-    dispose();
   }
 }

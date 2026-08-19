@@ -29,38 +29,54 @@ class FireGuardTopBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: Row(
         children: [
-          const Icon(Icons.local_fire_department, color: AppColors.industrialOrange, size: 20),
+          const Icon(
+            Icons.local_fire_department,
+            color: AppColors.industrialOrange,
+            size: 20,
+          ),
           const SizedBox(width: 6),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: AppColors.industrialOrange,
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: AppColors.industrialOrange,
+              ),
             ),
           ),
         ],
       ),
       actions: [
         if (userRole != null)
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 14),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              userRole!.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: AppColors.onSurfaceVariantText,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 92),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                userRole!.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onSurfaceVariantText,
+                ),
               ),
             ),
           ),
         IconButton(
-          icon: const Icon(Icons.account_circle, color: AppColors.onSurfaceVariantText),
+          icon: const Icon(
+            Icons.account_circle,
+            color: AppColors.onSurfaceVariantText,
+          ),
           onPressed: onProfileClick,
         ),
       ],
