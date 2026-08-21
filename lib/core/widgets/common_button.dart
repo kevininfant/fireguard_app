@@ -28,7 +28,11 @@ class CommonButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = backgroundColor ?? AppColors.industrialOrange;
-    final fg = textColor ?? (isOutlined ? AppColors.industrialOrange : AppColors.onIndustrialOrange);
+    final fg =
+        textColor ??
+        (isOutlined
+            ? AppColors.industrialOrange
+            : AppColors.onIndustrialOrange);
 
     if (isOutlined) {
       return SizedBox(
@@ -39,7 +43,9 @@ class CommonButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: fg,
             side: BorderSide(color: bg),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           child: _buildChild(fg),
         ),
@@ -77,24 +83,24 @@ class CommonButton extends StatelessWidget {
     if (icon != null) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20, color: fg),
+          Flexible(flex: 0, child: Icon(icon, size: 20, color: fg)),
           const SizedBox(width: 8),
-          Text(
-            text,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              letterSpacing: 0.8,
-              color: fg,
-            ),
-          ),
+          Flexible(child: _buildLabel(fg)),
         ],
       );
     }
 
+    return _buildLabel(fg);
+  }
+
+  Widget _buildLabel(Color fg) {
     return Text(
       text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 14,

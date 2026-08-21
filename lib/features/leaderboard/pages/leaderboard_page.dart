@@ -13,17 +13,33 @@ import 'package:fireguard_app/features/leaderboard/widgets/leaderboard_tile.dart
 class LeaderboardPage extends StatelessWidget {
   const LeaderboardPage({super.key});
 
-  static const List<String> categories = ['Weekly', 'All-Time', 'Industry Rank'];
+  static const List<String> categories = [
+    'Weekly',
+    'All-Time',
+    'Industry Rank',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         final currentUserName = authState.user?.displayName ?? 'Alex Rivera';
+        final currentUser = authState.user;
 
         return BlocBuilder<LeaderboardBloc, LeaderboardState>(
           builder: (context, state) {
-            if (state.status == LeaderboardStatus.loading && state.users.isEmpty) {
+            if (state.status == LeaderboardStatus.initial) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) {
+                  context.read<LeaderboardBloc>().add(
+                    LeaderboardStarted(currentUser: currentUser),
+                  );
+                }
+              });
+            }
+
+            if (state.status == LeaderboardStatus.loading &&
+                state.users.isEmpty) {
               return const LoadingView(message: 'Loading Global Rankings...');
             }
 
@@ -32,7 +48,9 @@ class LeaderboardPage extends StatelessWidget {
 
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<LeaderboardBloc>().add(LeaderboardStarted());
+                context.read<LeaderboardBloc>().add(
+                  LeaderboardStarted(currentUser: currentUser),
+                );
               },
               color: AppColors.industrialOrange,
               child: SingleChildScrollView(
@@ -56,13 +74,22 @@ class LeaderboardPage extends StatelessWidget {
                             return Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  context.read<LeaderboardBloc>().add(LeaderboardCategoryChanged(cat));
+                                  context.read<LeaderboardBloc>().add(
+                                    LeaderboardCategoryChanged(
+                                      cat,
+                                      currentUser: currentUser,
+                                    ),
+                                  );
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: isSelected ? AppColors.industrialOrange : Colors.transparent,
+                                    color: isSelected
+                                        ? AppColors.industrialOrange
+                                        : Colors.transparent,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -71,7 +98,9 @@ class LeaderboardPage extends StatelessWidget {
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
-                                      color: isSelected ? AppColors.onIndustrialOrange : AppColors.onSurfaceVariantText,
+                                      color: isSelected
+                                          ? AppColors.onIndustrialOrange
+                                          : AppColors.onSurfaceVariantText,
                                     ),
                                   ),
                                 ),
@@ -110,11 +139,11 @@ class LeaderboardPage extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final user = remainingUsers[index];
-                        final isMe = user.displayName.toLowerCase() == currentUserName.toLowerCase();
-                        return LeaderboardTile(
-                          user: user,
-                          isCurrentUser: isMe,
-                        );
+                        final isMe = currentUser != null
+                            ? user.uid == currentUser.uid
+                            : user.displayName.toLowerCase() ==
+                                  currentUserName.toLowerCase();
+                        return LeaderboardTile(user: user, isCurrentUser: isMe);
                       },
                     ),
                   ],

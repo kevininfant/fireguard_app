@@ -10,10 +10,12 @@ import 'package:fireguard_app/routes/app_routes.dart';
 
 class VerifyCodePage extends StatefulWidget {
   final String email;
+  final String? recoveryCode;
 
   const VerifyCodePage({
     super.key,
     required this.email,
+    this.recoveryCode,
   });
 
   @override
@@ -22,7 +24,7 @@ class VerifyCodePage extends StatefulWidget {
 
 class _VerifyCodePageState extends State<VerifyCodePage> {
   final _formKey = GlobalKey<FormState>();
-  final _codeController = TextEditingController(text: '123456');
+  final _codeController = TextEditingController();
 
   @override
   void dispose() {
@@ -54,6 +56,13 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               'code': _codeController.text.trim(),
             },
           );
+        } else if (state.status == AuthStatus.codeSent) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('New recovery code: ${state.resetCode}'),
+              backgroundColor: AppColors.successGreen,
+            ),
+          );
         } else if (state.status == AuthStatus.error && state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -65,6 +74,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       },
       builder: (context, state) {
         final isLoading = state.status == AuthStatus.loading;
+        final recoveryCode = state.resetCode ?? widget.recoveryCode;
 
         return Scaffold(
           backgroundColor: AppColors.darkBackground,
@@ -127,16 +137,36 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                               height: 1.4,
                             ),
                           ),
+                          if (recoveryCode != null) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceContainerLow,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.industrialGold.withValues(alpha: 0.5)),
+                              ),
+                              child: Text(
+                                'Development recovery code: $recoveryCode',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.industrialGold,
+                                ),
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 24),
                           CustomTextField(
                             controller: _codeController,
                             label: '6-Digit Verification Code',
-                            hintText: '123456',
+                            hintText: 'Enter 6-digit code',
                             prefixIcon: Icons.pin_outlined,
                             keyboardType: TextInputType.number,
                             validator: (v) {
-                              if (v == null || v.trim().length < 4) {
-                                return 'Please enter the verification code';
+                              if (v == null || !RegExp(r'^\d{6}$').hasMatch(v.trim())) {
+                                return 'Please enter a valid 6-digit code';
                               }
                               return null;
                             },

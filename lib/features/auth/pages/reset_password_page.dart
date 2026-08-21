@@ -40,7 +40,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           Navigator.pushNamed(
             context,
             AppRoutes.verifyCode,
-            arguments: _emailController.text.trim(),
+            arguments: {
+              'email': _emailController.text.trim(),
+              'code': state.resetCode,
+            },
           );
         } else if (state.status == AuthStatus.error && state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(

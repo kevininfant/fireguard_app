@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fireguard_app/features/auth/data/models/user_model.dart';
 import 'package:fireguard_app/features/auth/data/services/auth_service.dart';
 
@@ -67,22 +69,39 @@ class AuthRepository {
     return user;
   }
 
-  Future<void> sendPasswordResetOtp(String email) async {
+  Future<String> sendPasswordResetOtp(String email) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final exists = await _authService.hasAccount(email);
     if (!exists) {
       throw Exception('No account found for this email.');
     }
+
+    final code = _generateResetCode();
+    await _authService.saveResetCode(
+      email: email,
+      code: code,
+      expiresAt: DateTime.now().add(const Duration(minutes: 10)),
+    );
+    return code;
   }
 
   Future<bool> verifyOtp(String email, String code) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return code.length == 6 || code == '123456';
+    if (!RegExp(r'^\d{6}$').hasMatch(code)) return false;
+
+    final savedCode = await _authService.getValidResetCode(email);
+    return savedCode == code;
   }
 
-  Future<void> setNewPassword(String email, String newPassword) async {
+  Future<void> setNewPassword(String email, String code, String newPassword) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    final isValid = await verifyOtp(email, code);
+    if (!isValid) {
+      throw Exception('Invalid or expired verification code.');
+    }
+
     await _authService.updatePassword(email, newPassword);
+    await _authService.clearResetCode(email);
   }
 
   Future<void> updateUser(User user) async {
@@ -92,5 +111,10 @@ class AuthRepository {
 
   Future<void> logout() async {
     await _authService.clearUser();
+  }
+
+  String _generateResetCode() {
+    final random = Random.secure();
+    return List.generate(6, (_) => random.nextInt(10)).join();
   }
 }

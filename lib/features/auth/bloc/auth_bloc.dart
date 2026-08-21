@@ -116,9 +116,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(state.copyWith(status: AuthStatus.loading));
     try {
-      await _authRepository.sendPasswordResetOtp(event.email);
+      final code = await _authRepository.sendPasswordResetOtp(event.email);
       emit(
-        state.copyWith(status: AuthStatus.codeSent, resetEmail: event.email),
+        state.copyWith(
+          status: AuthStatus.codeSent,
+          resetEmail: event.email,
+          resetCode: code,
+        ),
       );
     } catch (e) {
       emit(
@@ -163,7 +167,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(state.copyWith(status: AuthStatus.loading));
     try {
-      await _authRepository.setNewPassword(event.email, event.newPassword);
+      await _authRepository.setNewPassword(
+        event.email,
+        event.code,
+        event.newPassword,
+      );
       emit(state.copyWith(status: AuthStatus.passwordUpdated));
     } catch (e) {
       emit(

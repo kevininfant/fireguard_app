@@ -7,8 +7,8 @@ class LeaderboardBloc extends Bloc<LeaderboardEvent, LeaderboardState> {
   final LeaderboardRepository _leaderboardRepository;
 
   LeaderboardBloc({LeaderboardRepository? leaderboardRepository})
-      : _leaderboardRepository = leaderboardRepository ?? LeaderboardRepository(),
-        super(const LeaderboardState()) {
+    : _leaderboardRepository = leaderboardRepository ?? LeaderboardRepository(),
+      super(const LeaderboardState()) {
     on<LeaderboardStarted>(_onStarted);
     on<LeaderboardCategoryChanged>(_onCategoryChanged);
   }
@@ -19,16 +19,18 @@ class LeaderboardBloc extends Bloc<LeaderboardEvent, LeaderboardState> {
   ) async {
     emit(state.copyWith(status: LeaderboardStatus.loading));
     try {
-      final users = await _leaderboardRepository.getTopUsers(category: state.selectedCategory);
-      emit(state.copyWith(
-        status: LeaderboardStatus.success,
-        users: users,
-      ));
+      final users = await _leaderboardRepository.getTopUsers(
+        category: state.selectedCategory,
+        currentUser: event.currentUser,
+      );
+      emit(state.copyWith(status: LeaderboardStatus.success, users: users));
     } catch (e) {
-      emit(state.copyWith(
-        status: LeaderboardStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: LeaderboardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -38,7 +40,10 @@ class LeaderboardBloc extends Bloc<LeaderboardEvent, LeaderboardState> {
   ) async {
     emit(state.copyWith(selectedCategory: event.category));
     try {
-      final users = await _leaderboardRepository.getTopUsers(category: event.category);
+      final users = await _leaderboardRepository.getTopUsers(
+        category: event.category,
+        currentUser: event.currentUser,
+      );
       emit(state.copyWith(users: users));
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));

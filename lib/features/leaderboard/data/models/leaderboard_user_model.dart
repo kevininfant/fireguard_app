@@ -19,6 +19,26 @@ class LeaderboardUserModel extends Equatable {
     this.category = 'All-Time',
   });
 
+  LeaderboardUserModel copyWith({
+    String? uid,
+    String? displayName,
+    String? designation,
+    int? totalPoints,
+    int? rank,
+    String? avatarUrl,
+    String? category,
+  }) {
+    return LeaderboardUserModel(
+      uid: uid ?? this.uid,
+      displayName: displayName ?? this.displayName,
+      designation: designation ?? this.designation,
+      totalPoints: totalPoints ?? this.totalPoints,
+      rank: rank ?? this.rank,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      category: category ?? this.category,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
@@ -44,5 +64,13 @@ class LeaderboardUserModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [uid, displayName, designation, totalPoints, rank, avatarUrl, category];
+  List<Object?> get props => [
+    uid,
+    displayName,
+    designation,
+    totalPoints,
+    rank,
+    avatarUrl,
+    category,
+  ];
 }

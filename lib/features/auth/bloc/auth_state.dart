@@ -9,6 +9,7 @@ class AuthState extends Equatable {
   final String selectedRole;
   final String? errorMessage;
   final String? resetEmail;
+  final String? resetCode;
 
   const AuthState({
     this.status = AuthStatus.initial,
@@ -16,6 +17,7 @@ class AuthState extends Equatable {
     this.selectedRole = 'EHS Manager',
     this.errorMessage,
     this.resetEmail,
+    this.resetCode,
   });
 
   AuthState copyWith({
@@ -24,6 +26,7 @@ class AuthState extends Equatable {
     String? selectedRole,
     String? errorMessage,
     String? resetEmail,
+    String? resetCode,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -31,9 +34,10 @@ class AuthState extends Equatable {
       selectedRole: selectedRole ?? this.selectedRole,
       errorMessage: errorMessage,
       resetEmail: resetEmail ?? this.resetEmail,
+      resetCode: resetCode ?? this.resetCode,
     );
   }
 
   @override
-  List<Object?> get props => [status, user, selectedRole, errorMessage, resetEmail];
+  List<Object?> get props => [status, user, selectedRole, errorMessage, resetEmail, resetCode];
 }

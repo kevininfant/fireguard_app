@@ -5,6 +5,7 @@ import 'package:fireguard_app/features/auth/data/models/user_model.dart';
 class AuthService {
   static const String _userKey = 'fireguard_user_session';
   static const String _accountsKey = 'fireguard_accounts';
+  static const String _resetCodesKey = 'fireguard_reset_codes';
   static const String _tokenKey = 'auth_token';
 
   Future<User?> getSavedUser() async {
@@ -76,6 +77,43 @@ class AuthService {
     await prefs.setString(_accountsKey, jsonEncode(accounts));
   }
 
+  Future<void> saveResetCode({
+    required String email,
+    required String code,
+    required DateTime expiresAt,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final resetCodes = await _getResetCodes();
+    resetCodes[_normalizeEmail(email)] = {
+      'code': code,
+      'expiresAt': expiresAt.toIso8601String(),
+    };
+    await prefs.setString(_resetCodesKey, jsonEncode(resetCodes));
+  }
+
+  Future<String?> getValidResetCode(String email) async {
+    final resetCodes = await _getResetCodes();
+    final resetCode = resetCodes[_normalizeEmail(email)];
+    if (resetCode is! Map) return null;
+
+    final data = Map<String, dynamic>.from(resetCode);
+    final code = data['code'] as String?;
+    final expiresAt = DateTime.tryParse(data['expiresAt'] as String? ?? '');
+    if (code == null || expiresAt == null || DateTime.now().isAfter(expiresAt)) {
+      await clearResetCode(email);
+      return null;
+    }
+
+    return code;
+  }
+
+  Future<void> clearResetCode(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    final resetCodes = await _getResetCodes();
+    resetCodes.remove(_normalizeEmail(email));
+    await prefs.setString(_resetCodesKey, jsonEncode(resetCodes));
+  }
+
   Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
@@ -89,6 +127,18 @@ class AuthService {
 
     try {
       return Map<String, dynamic>.from(jsonDecode(accountsJson) as Map);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> _getResetCodes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final resetCodesJson = prefs.getString(_resetCodesKey);
+    if (resetCodesJson == null) return {};
+
+    try {
+      return Map<String, dynamic>.from(jsonDecode(resetCodesJson) as Map);
     } catch (_) {
       return {};
     }

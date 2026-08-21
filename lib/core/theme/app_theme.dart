@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fireguard_app/core/constants/app_colors.dart';
 
 class AppTheme {
   AppTheme._();
 
   static ThemeData get darkTheme {
-    final baseTextTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme);
+    final baseTextTheme = ThemeData.dark().textTheme;
 
     return ThemeData(
       useMaterial3: true,
@@ -35,46 +34,46 @@ class AppTheme {
         outlineVariant: AppColors.outlineVariantColor,
       ),
       textTheme: baseTextTheme.copyWith(
-        headlineLarge: GoogleFonts.outfit(
+        headlineLarge: baseTextTheme.headlineLarge?.copyWith(
           fontSize: 32,
           fontWeight: FontWeight.w900,
           color: AppColors.onSurfaceText,
-          letterSpacing: -0.5,
+          letterSpacing: 0,
         ),
-        headlineMedium: GoogleFonts.outfit(
+        headlineMedium: baseTextTheme.headlineMedium?.copyWith(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurfaceText,
         ),
-        titleLarge: GoogleFonts.outfit(
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurfaceText,
         ),
-        titleMedium: GoogleFonts.inter(
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurfaceText,
         ),
-        bodyLarge: GoogleFonts.inter(
+        bodyLarge: baseTextTheme.bodyLarge?.copyWith(
           fontSize: 16,
           color: AppColors.onSurfaceText,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: baseTextTheme.bodyMedium?.copyWith(
           fontSize: 14,
           color: AppColors.onSurfaceText,
         ),
-        bodySmall: GoogleFonts.inter(
+        bodySmall: baseTextTheme.bodySmall?.copyWith(
           fontSize: 12,
           color: AppColors.onSurfaceVariantText,
         ),
-        labelLarge: GoogleFonts.inter(
+        labelLarge: baseTextTheme.labelLarge?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
           color: AppColors.onSurfaceText,
         ),
-        labelMedium: GoogleFonts.inter(
+        labelMedium: baseTextTheme.labelMedium?.copyWith(
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.0,
@@ -120,7 +119,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.industrialOrange,
           foregroundColor: AppColors.onIndustrialOrange,
-          textStyle: GoogleFonts.inter(
+          textStyle: baseTextTheme.labelLarge?.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,

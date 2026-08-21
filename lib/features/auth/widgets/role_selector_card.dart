@@ -76,12 +76,16 @@ class RoleSelectorCard extends StatelessWidget {
                         size: 20,
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        r['label'] as String,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AppColors.industrialOrange : AppColors.onSurfaceText,
+                      Expanded(
+                        child: Text(
+                          r['label'] as String,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            color: isSelected ? AppColors.industrialOrange : AppColors.onSurfaceText,
+                          ),
                         ),
                       ),
                     ],

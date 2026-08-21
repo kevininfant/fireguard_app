@@ -48,12 +48,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
         return;
       }
       context.read<AuthBloc>().add(
-            AuthSetNewPassword(
-              email: widget.email,
-              code: widget.code,
-              newPassword: _newPasswordController.text,
-            ),
-          );
+        AuthSetNewPassword(
+          email: widget.email,
+          code: widget.code,
+          newPassword: _newPasswordController.text,
+        ),
+      );
     }
   }
 
@@ -68,8 +68,13 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
               backgroundColor: AppColors.successGreen,
             ),
           );
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.auth, (route) => false);
-        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.auth,
+            (route) => false,
+          );
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
@@ -87,14 +92,20 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.industrialOrange),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: AppColors.industrialOrange,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 440),
                   child: Container(
@@ -102,7 +113,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.surfaceContainerHighest),
+                      border: Border.all(
+                        color: AppColors.surfaceContainerHighest,
+                      ),
                     ),
                     child: Form(
                       key: _formKey,
@@ -116,7 +129,11 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             decoration: BoxDecoration(
                               color: AppColors.surfaceContainerLow,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.industrialOrange.withValues(alpha: 0.5)),
+                              border: Border.all(
+                                color: AppColors.industrialOrange.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
                             ),
                             child: const Icon(
                               Icons.lock_clock,
@@ -150,7 +167,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             obscureText: _obscurePassword,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: AppColors.onSurfaceVariantText,
                                 size: 20,
                               ),
@@ -169,9 +188,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             hintText: 'Repeat new passcode',
                             prefixIcon: Icons.lock_outline,
                             obscureText: _obscurePassword,
-                            validator: (v) => Validators.validateNotEmpty(v, 'Confirm Passcode'),
+                            validator: (v) => Validators.validateNotEmpty(
+                              v,
+                              'Confirm Passcode',
+                            ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 2),
                           CommonButton(
                             text: 'UPDATE PASSCODE & SIGN IN',
                             isLoading: isLoading,

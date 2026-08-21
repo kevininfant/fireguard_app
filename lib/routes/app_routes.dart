@@ -50,15 +50,21 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const ResetPasswordPage());
 
       case verifyCode:
-        final email = routeSettings.arguments as String? ?? 'inspector@fireguard.org';
-        return MaterialPageRoute(builder: (_) => VerifyCodePage(email: email));
+        final args = routeSettings.arguments;
+        final email = args is Map<String, dynamic>
+            ? args['email'] as String? ?? ''
+            : args as String? ?? '';
+        final code = args is Map<String, dynamic> ? args['code'] as String? : null;
+        return MaterialPageRoute(
+          builder: (_) => VerifyCodePage(email: email, recoveryCode: code),
+        );
 
       case setNewPassword:
         final args = routeSettings.arguments as Map<String, dynamic>? ?? {};
         return MaterialPageRoute(
           builder: (_) => SetNewPasswordPage(
-            email: args['email'] ?? 'inspector@fireguard.org',
-            code: args['code'] ?? '123456',
+            email: args['email'] ?? '',
+            code: args['code'] ?? '',
           ),
         );
 

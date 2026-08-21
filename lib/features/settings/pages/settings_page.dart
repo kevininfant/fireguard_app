@@ -103,8 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: settings.darkModeEnabled,
                 onChanged: (v) {
                   context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(darkModeEnabled: v)),
-                      );
+                    SettingsUpdated(settings.copyWith(darkModeEnabled: v)),
+                  );
                 },
               ),
               const SizedBox(height: 8),
@@ -115,68 +115,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: settings.sfxEnabled,
                 onChanged: (v) {
                   context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(sfxEnabled: v)),
-                      );
-                },
-              ),
-              const SizedBox(height: 8),
-              SettingsSwitchCard(
-                title: 'Haptic Feedback',
-                subtitle: 'Vibration buzz on timer warnings and drill actions',
-                icon: Icons.vibration,
-                value: settings.hapticEnabled,
-                onChanged: (v) {
-                  context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(hapticEnabled: v)),
-                      );
-                },
-              ),
-              const SizedBox(height: 8),
-              SettingsSwitchCard(
-                title: 'Timer Warning Alerts',
-                subtitle: 'Flashing red indicator when 10s remaining in drill',
-                icon: Icons.timer,
-                value: settings.timerWarningsEnabled,
-                onChanged: (v) {
-                  context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(timerWarningsEnabled: v)),
-                      );
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // Section: Daily Drill & Reminder
-              const Text(
-                'TRAINING SCHEDULE & NOTIFICATIONS',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.0,
-                  color: AppColors.onSurfaceVariantText,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SettingsSwitchCard(
-                title: 'Daily Training Reminders',
-                subtitle: 'Scheduled notifications to maintain safety streak',
-                icon: Icons.notifications_active,
-                value: settings.dailyReminderEnabled,
-                onChanged: (v) {
-                  context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(dailyReminderEnabled: v)),
-                      );
-                },
-              ),
-              const SizedBox(height: 8),
-              SettingsSwitchCard(
-                title: 'Streak Saver Protection',
-                subtitle: 'Automatically protect streak if emergency callout occurs',
-                icon: Icons.shield,
-                value: settings.streakSaverEnabled,
-                onChanged: (v) {
-                  context.read<SettingsBloc>().add(
-                        SettingsUpdated(settings.copyWith(streakSaverEnabled: v)),
-                      );
+                    SettingsUpdated(settings.copyWith(sfxEnabled: v)),
+                  );
                 },
               ),
               const SizedBox(height: 24),
@@ -219,7 +159,10 @@ class _SettingsPageState extends State<SettingsPage> {
             appBar: AppBar(
               title: const Text('Settings'),
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.industrialOrange),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.industrialOrange,
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
             ),

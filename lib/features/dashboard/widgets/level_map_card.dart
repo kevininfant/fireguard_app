@@ -39,7 +39,7 @@ class LevelMapCard extends StatelessWidget {
           : onClick,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           color: containerColor,
           borderRadius: BorderRadius.circular(12),
@@ -59,8 +59,8 @@ class LevelMapCard extends StatelessWidget {
           children: [
             // Icon Ring
             Container(
-              width: 50,
-              height: 50,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isCompleted
@@ -89,13 +89,13 @@ class LevelMapCard extends StatelessWidget {
                 size: 24,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
             // Level Title
             Text(
               'LEVEL ${level.levelNumber}',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
                 color: isLocked ? AppColors.textMuted : AppColors.onSurfaceText,
@@ -116,7 +116,7 @@ class LevelMapCard extends StatelessWidget {
                     : AppColors.onSurfaceVariantText,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             // Status Pill
             Container(
@@ -129,17 +129,21 @@ class LevelMapCard extends StatelessWidget {
                           : AppColors.surfaceContainerHighest),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Text(
-                level.status,
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                  color: isCompleted
-                      ? AppColors.industrialOrange
-                      : (isActive
-                            ? AppColors.industrialGold
-                            : AppColors.textMuted),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  level.status,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    color: isCompleted
+                        ? AppColors.industrialOrange
+                        : (isActive
+                              ? AppColors.industrialGold
+                              : AppColors.textMuted),
+                  ),
                 ),
               ),
             ),

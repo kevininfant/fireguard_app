@@ -133,24 +133,28 @@ class LeaderboardPodium extends StatelessWidget {
           const SizedBox(height: 8),
 
           // Podium Column
-          Container(
+          SizedBox(
             height: height,
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerHigh,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-              border: Border(
-                top: BorderSide(color: rankColor, width: 3),
-                left: const BorderSide(color: AppColors.surfaceContainerHighest),
-                right: const BorderSide(color: AppColors.surfaceContainerHighest),
+            child: ColoredBox(
+              color: AppColors.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(1),
+                child: ColoredBox(
+                  color: AppColors.surfaceContainerHigh,
+                  child: Column(
+                    children: [
+                      Container(height: 3, color: rankColor),
+                      const SizedBox(height: 8),
+                      Icon(
+                        Icons.military_tech,
+                        color: rankColor.withValues(alpha: 0.6),
+                        size: 28,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            alignment: Alignment.topCenter,
-            padding: const EdgeInsets.only(top: 8),
-            child: Icon(
-              Icons.military_tech,
-              color: rankColor.withValues(alpha: 0.6),
-              size: 28,
             ),
           ),
         ],
