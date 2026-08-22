@@ -10,6 +10,8 @@ class DashboardStarted extends DashboardEvent {}
 
 class DashboardRefreshRequested extends DashboardEvent {}
 
+class DashboardSeedFirebaseRequested extends DashboardEvent {}
+
 class DashboardLevelCompleted extends DashboardEvent {
   final int levelId;
   final int pointsEarned;

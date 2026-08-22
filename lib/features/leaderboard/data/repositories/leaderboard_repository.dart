@@ -1,89 +1,76 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fireguard_app/features/auth/data/models/user_model.dart';
 import 'package:fireguard_app/features/leaderboard/data/models/leaderboard_user_model.dart';
 
 class LeaderboardRepository {
-  final List<LeaderboardUserModel> _defaultUsers = const [
-    LeaderboardUserModel(
-      uid: 'u1',
-      displayName: 'Chief Officer Miller',
-      designation: 'Lead EHS Director',
-      totalPoints: 2850,
-      rank: 1,
-      avatarUrl:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    ),
-    LeaderboardUserModel(
-      uid: 'u2',
-      displayName: 'Sarah Jenkins',
-      designation: 'Senior Safety Officer',
-      totalPoints: 2410,
-      rank: 2,
-      avatarUrl:
-          'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-    ),
-    LeaderboardUserModel(
-      uid: 'u3',
-      displayName: 'David Vance',
-      designation: 'Industrial Inspector',
-      totalPoints: 1980,
-      rank: 3,
-      avatarUrl:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-    ),
-    LeaderboardUserModel(
-      uid: 'u4',
-      displayName: 'Alex Rivera',
-      designation: 'Site Compliance Lead',
-      totalPoints: 1750,
-      rank: 4,
-    ),
-    LeaderboardUserModel(
-      uid: 'u5',
-      displayName: 'Elena Rostova',
-      designation: 'EHS Manager',
-      totalPoints: 1620,
-      rank: 5,
-    ),
-    LeaderboardUserModel(
-      uid: 'u6',
-      displayName: 'Marcus Thorne',
-      designation: 'Fire Safety Tech',
-      totalPoints: 1490,
-      rank: 6,
-    ),
-    LeaderboardUserModel(
-      uid: 'u7',
-      displayName: 'Carlos Mendez',
-      designation: 'Hazmat Specialist',
-      totalPoints: 1380,
-      rank: 7,
-    ),
-  ];
+  final FirebaseFirestore _firestore;
 
+  LeaderboardRepository({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  /// Fetches rankings purely and dynamically from Cloud Firestore 'users' collection.
   Future<List<LeaderboardUserModel>> getTopUsers({
     String category = 'All-Time',
     User? currentUser,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    final users = _defaultUsers
-        .map((user) => _scoreForCategory(user, category))
-        .toList();
+    final Map<String, LeaderboardUserModel> usersMap = {};
 
-    if (currentUser != null) {
-      users.removeWhere(
-        (user) =>
-            user.uid == currentUser.uid ||
-            user.displayName.toLowerCase() ==
-                currentUser.displayName.toLowerCase(),
-      );
-      users.add(_currentUserEntry(currentUser, category));
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final uid = doc.id;
+        final name = (data['displayName'] as String?)?.trim().isNotEmpty == true
+            ? (data['displayName'] as String)
+            : ((data['email'] as String?)?.split('@').first ?? 'Officer');
+        final role = (data['role'] as String?) ?? 'Safety Inspector';
+        final points = (data['points'] is num)
+            ? (data['points'] as num).toInt()
+            : 500;
+        final streak = (data['streakDays'] is num)
+            ? (data['streakDays'] as num).toInt()
+            : 1;
+        final level = (data['currentLevel'] is num)
+            ? (data['currentLevel'] as num).toInt()
+            : 1;
+        final badgesCount = (data['badges'] as List?)?.length ?? 1;
+
+        final calculatedPoints = switch (category) {
+          'Weekly' => (points * 0.35).round() + (streak * 45),
+          'Industry Rank' => points + (level * 180) + (badgesCount * 90),
+          _ => points,
+        };
+
+        usersMap[uid] = LeaderboardUserModel(
+          uid: uid,
+          displayName: name,
+          designation: role,
+          totalPoints: calculatedPoints,
+          rank: 0,
+          category: category,
+          avatarUrl: data['avatarUrl'] as String?,
+        );
+      }
+    } catch (e) {
+      debugPrint('LeaderboardRepository Firestore fetch error: $e');
     }
 
-    users.sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
+    // Ensure the active logged-in officer is present with current scores
+    if (currentUser != null) {
+      usersMap[currentUser.uid] = _currentUserEntry(currentUser, category);
+    }
+
+    final usersList = usersMap.values.toList();
+    usersList.sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
 
     return [
-      for (var index = 0; index < users.length; index++)
-        users[index].copyWith(rank: index + 1),
+      for (var index = 0; index < usersList.length; index++)
+        usersList[index].copyWith(rank: index + 1),
     ];
   }
 
@@ -97,24 +84,13 @@ class LeaderboardRepository {
 
     return LeaderboardUserModel(
       uid: user.uid,
-      displayName: user.displayName,
+      displayName: user.displayName.isNotEmpty
+          ? user.displayName
+          : (user.email.split('@').first),
       designation: user.role,
       totalPoints: basePoints,
       rank: 0,
       category: category,
     );
-  }
-
-  LeaderboardUserModel _scoreForCategory(
-    LeaderboardUserModel user,
-    String category,
-  ) {
-    final score = switch (category) {
-      'Weekly' => (user.totalPoints * 0.28).round() + (8 - user.rank) * 35,
-      'Industry Rank' => user.totalPoints + (8 - user.rank) * 120,
-      _ => user.totalPoints,
-    };
-
-    return user.copyWith(totalPoints: score, category: category);
   }
 }

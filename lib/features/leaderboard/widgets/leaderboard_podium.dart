@@ -10,11 +10,11 @@ class LeaderboardPodium extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (topThree.length < 3) return const SizedBox.shrink();
+    if (topThree.isEmpty) return const SizedBox.shrink();
 
     final first = topThree[0];
-    final second = topThree[1];
-    final third = topThree[2];
+    final second = topThree.length > 1 ? topThree[1] : null;
+    final third = topThree.length > 2 ? topThree[2] : null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -23,12 +23,16 @@ class LeaderboardPodium extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // 2nd Place (Silver)
-          _buildPodiumSpot(
-            user: second,
-            rank: 2,
-            height: 110,
-            rankColor: const Color(0xFFC0C0C0),
-          ),
+          if (second != null)
+            _buildPodiumSpot(
+              user: second,
+              rank: 2,
+              height: 110,
+              rankColor: const Color(0xFFC0C0C0),
+            )
+          else if (topThree.length > 1)
+            const Spacer(),
+
           const SizedBox(width: 12),
 
           // 1st Place (Gold)
@@ -39,15 +43,19 @@ class LeaderboardPodium extends StatelessWidget {
             rankColor: AppColors.industrialGold,
             isCenter: true,
           ),
+
           const SizedBox(width: 12),
 
           // 3rd Place (Bronze)
-          _buildPodiumSpot(
-            user: third,
-            rank: 3,
-            height: 95,
-            rankColor: const Color(0xFFCD7F32),
-          ),
+          if (third != null)
+            _buildPodiumSpot(
+              user: third,
+              rank: 3,
+              height: 95,
+              rankColor: const Color(0xFFCD7F32),
+            )
+          else if (topThree.length > 1)
+            const Spacer(),
         ],
       ),
     );

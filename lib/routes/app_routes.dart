@@ -27,6 +27,7 @@ class AppRoutes {
   static const String feed = '/feed';
   static const String leaderboard = '/leaderboard';
   static const String rewards = '/rewards';
+  static const String admob = '/admob';
   static const String quiz = '/quiz';
   static const String quizResults = '/quiz-results';
   static const String profile = '/profile';
@@ -78,6 +79,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MainScaffoldWrapper(initialTabIndex: 2));
 
       case rewards:
+      case admob:
         return MaterialPageRoute(builder: (_) => const MainScaffoldWrapper(initialTabIndex: 3));
 
       case quiz:

@@ -211,11 +211,11 @@ class SidebarDrawer extends StatelessWidget {
                             onTap: () => onNavigate(AppRoutes.leaderboard),
                           ),
                           _buildDrawerItem(
-                            label: 'REWARD STORE',
-                            icon: Icons.shopping_cart_outlined,
-                            selectedIcon: Icons.shopping_cart,
-                            isSelected: currentRoute == AppRoutes.rewards,
-                            onTap: () => onNavigate(AppRoutes.rewards),
+                            label: 'ADMOB REWARD HUB',
+                            icon: Icons.ad_units_outlined,
+                            selectedIcon: Icons.ad_units,
+                            isSelected: currentRoute == AppRoutes.admob || currentRoute == AppRoutes.rewards,
+                            onTap: () => onNavigate(AppRoutes.admob),
                           ),
                           _buildDrawerItem(
                             label: 'BOOKMARKED QUESTIONS',

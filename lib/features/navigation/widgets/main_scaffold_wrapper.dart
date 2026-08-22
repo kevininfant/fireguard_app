@@ -8,7 +8,7 @@ import 'package:fireguard_app/features/dashboard/pages/dashboard_page.dart';
 import 'package:fireguard_app/features/dashboard/widgets/officer_profile_dialog.dart';
 import 'package:fireguard_app/features/feed/pages/feed_page.dart';
 import 'package:fireguard_app/features/leaderboard/pages/leaderboard_page.dart';
-import 'package:fireguard_app/features/rewards/pages/rewards_page.dart';
+import 'package:fireguard_app/features/admob/pages/admob_page.dart';
 import 'package:fireguard_app/features/navigation/widgets/fireguard_top_bar.dart';
 import 'package:fireguard_app/features/navigation/widgets/fireguard_bottom_nav.dart';
 import 'package:fireguard_app/features/navigation/widgets/sidebar_drawer.dart';
@@ -42,7 +42,7 @@ class _MainScaffoldWrapperState extends State<MainScaffoldWrapper> {
       case 2:
         return AppRoutes.leaderboard;
       case 3:
-        return AppRoutes.rewards;
+        return AppRoutes.admob;
       default:
         return AppRoutes.dashboard;
     }
@@ -58,7 +58,7 @@ class _MainScaffoldWrapperState extends State<MainScaffoldWrapper> {
           DashboardPage(),
           FeedPage(),
           LeaderboardPage(),
-          RewardsPage(),
+          AdMobPage(),
         ];
 
         return Scaffold(
@@ -75,7 +75,7 @@ class _MainScaffoldWrapperState extends State<MainScaffoldWrapper> {
                 setState(() => _currentTabIndex = 1);
               } else if (route == AppRoutes.leaderboard) {
                 setState(() => _currentTabIndex = 2);
-              } else if (route == AppRoutes.rewards) {
+              } else if (route == AppRoutes.admob || route == AppRoutes.rewards) {
                 setState(() => _currentTabIndex = 3);
               } else {
                 Navigator.pushNamed(context, route);

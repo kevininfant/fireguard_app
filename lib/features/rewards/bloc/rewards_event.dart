@@ -12,12 +12,14 @@ class RewardsStarted extends RewardsEvent {}
 class RewardsCouponRedeemed extends RewardsEvent {
   final CouponModel coupon;
   final int userPoints;
+  final String? userId;
 
   const RewardsCouponRedeemed({
     required this.coupon,
     required this.userPoints,
+    this.userId,
   });
 
   @override
-  List<Object?> get props => [coupon, userPoints];
+  List<Object?> get props => [coupon, userPoints, userId];
 }

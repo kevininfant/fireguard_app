@@ -113,39 +113,113 @@ class LeaderboardPage extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Top 3 Podium
-                    LeaderboardPodium(topThree: topThree),
-                    const SizedBox(height: 16),
+                    if (topThree.isNotEmpty) ...[
+                      LeaderboardPodium(topThree: topThree),
+                      const SizedBox(height: 16),
+                    ],
 
-                    // Remaining Rankings List
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const Text(
-                        'FIELD INSPECTOR RANKINGS',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.0,
-                          color: AppColors.onSurfaceVariantText,
+                    // Dynamic Remaining Rankings List Header
+                    if (remainingUsers.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _getRankingHeader(state.selectedCategory),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.0,
+                                color: AppColors.onSurfaceVariantText,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: AppColors.outlineVariantColor,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.shield_outlined,
+                                    size: 12,
+                                    color: AppColors.industrialOrange,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${remainingUsers.length} OFFICER${remainingUsers.length == 1 ? '' : 'S'}',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                      color: AppColors.industrialOrange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: remainingUsers.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final user = remainingUsers[index];
-                        final isMe = currentUser != null
-                            ? user.uid == currentUser.uid
-                            : user.displayName.toLowerCase() ==
-                                  currentUserName.toLowerCase();
-                        return LeaderboardTile(user: user, isCurrentUser: isMe);
-                      },
-                    ),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: remainingUsers.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final user = remainingUsers[index];
+                          final isMe = currentUser != null
+                              ? user.uid == currentUser.uid
+                              : user.displayName.toLowerCase() ==
+                                    currentUserName.toLowerCase();
+                          return LeaderboardTile(user: user, isCurrentUser: isMe);
+                        },
+                      ),
+                    ] else if (topThree.isEmpty) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.leaderboard_outlined,
+                              size: 48,
+                              color: AppColors.onSurfaceVariantText,
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              'No Officers Ranked Yet',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.onSurfaceText,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Complete hazard clearance drills to appear on the global leaderboard.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.onSurfaceVariantText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -154,5 +228,17 @@ class LeaderboardPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _getRankingHeader(String category) {
+    switch (category) {
+      case 'Weekly':
+        return 'WEEKLY SPRINT STANDINGS';
+      case 'Industry Rank':
+        return 'INDUSTRY COMPLIANCE STANDINGS';
+      case 'All-Time':
+      default:
+        return 'GLOBAL INSPECTOR RANKINGS';
+    }
   }
 }

@@ -84,43 +84,50 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${levels.length} Dynamic Levels',
-                          style: const TextStyle(
+                          levels.isNotEmpty
+                              ? '${levels.length} Dynamic Levels'
+                              : 'No Data Found',
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.industrialOrange,
+                            color: levels.isNotEmpty
+                                ? AppColors.industrialOrange
+                                : AppColors.textMuted,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
 
-                    // Level Grid (3 Columns matching Kotlin Grid)
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.64,
-                          ),
-                      itemCount: levels.length,
-                      itemBuilder: (context, index) {
-                        final level = levels[index];
-                        return LevelMapCard(
-                          level: level,
-                          onClick: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.quiz,
-                              arguments: level.levelId,
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    // Level Grid or No Data View
+                    if (levels.isNotEmpty)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 0.64,
+                            ),
+                        itemCount: levels.length,
+                        itemBuilder: (context, index) {
+                          final level = levels[index];
+                          return LevelMapCard(
+                            level: level,
+                            onClick: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.quiz,
+                                arguments: level.levelId,
+                              );
+                            },
+                          );
+                        },
+                      )
+                    else
+                      _buildNoDataCard(context),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -129,6 +136,117 @@ class DashboardPage extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _buildNoDataCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.surfaceContainerHighest,
+          width: 1.2,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.industrialGold.withValues(alpha: 0.15),
+              border: Border.all(
+                color: AppColors.industrialGold.withValues(alpha: 0.4),
+                width: 1.5,
+              ),
+            ),
+            child: const Icon(
+              Icons.cloud_off_rounded,
+              color: AppColors.industrialGold,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'No Safety Certification Data Found',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: AppColors.onSurfaceText,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'No levels found in Firebase Firestore collection ("safety_levels"). You can add documents in Firebase Console or seed initial certification modules.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              height: 1.4,
+              color: AppColors.onSurfaceVariantText,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  context
+                      .read<DashboardBloc>()
+                      .add(DashboardSeedFirebaseRequested());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.industrialOrange,
+                  foregroundColor: AppColors.onIndustrialOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(Icons.cloud_upload_rounded, size: 16),
+                label: const Text(
+                  'Seed to Firebase',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(width: 10),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context
+                      .read<DashboardBloc>()
+                      .add(DashboardRefreshRequested());
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.onSurfaceText,
+                  side: const BorderSide(
+                    color: AppColors.surfaceContainerHighest,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text(
+                  'Refresh',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

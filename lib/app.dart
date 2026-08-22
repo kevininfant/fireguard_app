@@ -7,6 +7,8 @@ import 'package:fireguard_app/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:fireguard_app/features/dashboard/bloc/dashboard_event.dart';
 import 'package:fireguard_app/features/feed/bloc/feed_bloc.dart';
 import 'package:fireguard_app/features/feed/bloc/feed_event.dart';
+import 'package:fireguard_app/features/rewards/bloc/rewards_bloc.dart';
+import 'package:fireguard_app/features/rewards/bloc/rewards_event.dart';
 import 'package:fireguard_app/features/quiz/bloc/quiz_bloc.dart';
 import 'package:fireguard_app/features/leaderboard/bloc/leaderboard_bloc.dart';
 import 'package:fireguard_app/features/profile/bloc/profile_bloc.dart';
@@ -27,6 +29,7 @@ class FireGuardApp extends StatelessWidget {
         BlocProvider(create: (_) => FeedBloc()..add(FeedStarted())),
         BlocProvider(create: (_) => QuizBloc()),
         BlocProvider(create: (_) => LeaderboardBloc()),
+        BlocProvider(create: (_) => RewardsBloc()..add(RewardsStarted())),
         BlocProvider(create: (_) => ProfileBloc()..add(ProfileStarted())),
         BlocProvider(create: (_) => SettingsBloc()..add(SettingsStarted())),
       ],

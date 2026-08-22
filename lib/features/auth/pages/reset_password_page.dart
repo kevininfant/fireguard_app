@@ -18,7 +18,7 @@ class ResetPasswordPage extends StatefulWidget {
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'inspector@fireguard.org');
+  final _emailController = TextEditingController();
 
   @override
   void dispose() {

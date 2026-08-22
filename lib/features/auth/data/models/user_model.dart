@@ -17,11 +17,11 @@ class User extends Equatable {
     required this.email,
     required this.displayName,
     required this.role,
-    this.points = 1250,
-    this.currentLevel = 3,
-    this.streakDays = 3,
-    this.badges = const ['Fire Inspector Level 1'],
-    this.unlockedCoupons = const ['GRAINGER-20'],
+    this.points = 500,
+    this.currentLevel = 1,
+    this.streakDays = 1,
+    this.badges = const ['Safety Trainee'],
+    this.unlockedCoupons = const [],
     this.bookmarkedQuestions = const [],
   });
 
@@ -68,16 +68,16 @@ class User extends Equatable {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      uid: json['uid'] ?? 'usr_001',
-      email: json['email'] ?? 'inspector@fireguard.org',
-      displayName: json['displayName'] ?? 'Lead Inspector',
-      role: json['role'] ?? 'Safety Inspector',
-      points: json['points'] is int ? json['points'] : 1250,
-      currentLevel: json['currentLevel'] is int ? json['currentLevel'] : 3,
-      streakDays: json['streakDays'] is int ? json['streakDays'] : 3,
-      badges: (json['badges'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? ['Fire Inspector Level 1'],
-      unlockedCoupons: (json['unlockedCoupons'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? ['GRAINGER-20'],
-      bookmarkedQuestions: (json['bookmarkedQuestions'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      uid: json['uid']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      displayName: json['displayName']?.toString() ?? (json['email']?.toString().split('@').first ?? 'Safety Inspector'),
+      role: json['role']?.toString() ?? 'Safety Inspector',
+      points: (json['points'] is num) ? (json['points'] as num).toInt() : 500,
+      currentLevel: (json['currentLevel'] is num) ? (json['currentLevel'] as num).toInt() : 1,
+      streakDays: (json['streakDays'] is num) ? (json['streakDays'] as num).toInt() : 1,
+      badges: (json['badges'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const ['Safety Trainee'],
+      unlockedCoupons: (json['unlockedCoupons'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+      bookmarkedQuestions: (json['bookmarkedQuestions'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
     );
   }
 

@@ -45,7 +45,12 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     }
 
     try {
-      await _couponRepository.redeemCoupon(event.coupon.id);
+      final remainingPoints = event.userPoints - event.coupon.pointsCost;
+      await _couponRepository.redeemCoupon(
+        event.coupon.id,
+        userId: event.userId,
+        userPoints: remainingPoints,
+      );
       final coupons = await _couponRepository.getCoupons();
       emit(state.copyWith(
         status: RewardsStatus.success,

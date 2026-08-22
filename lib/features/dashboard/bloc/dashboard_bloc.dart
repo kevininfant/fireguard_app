@@ -11,7 +11,27 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         super(const DashboardState()) {
     on<DashboardStarted>(_onStarted);
     on<DashboardRefreshRequested>(_onRefresh);
+    on<DashboardSeedFirebaseRequested>(_onSeedFirebase);
     on<DashboardLevelCompleted>(_onLevelCompleted);
+  }
+
+  Future<void> _onSeedFirebase(
+    DashboardSeedFirebaseRequested event,
+    Emitter<DashboardState> emit,
+  ) async {
+    emit(state.copyWith(status: DashboardStatus.loading));
+    try {
+      final levels = await _dashboardRepository.seedDefaultLevelsToFirebase();
+      emit(state.copyWith(
+        status: DashboardStatus.success,
+        levels: levels,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: DashboardStatus.failure,
+        errorMessage: e.toString(),
+      ));
+    }
   }
 
   Future<void> _onStarted(

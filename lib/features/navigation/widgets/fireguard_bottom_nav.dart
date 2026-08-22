@@ -43,9 +43,9 @@ class FireGuardBottomNav extends StatelessWidget {
             label: 'Engagement',
           ),
           NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined, color: AppColors.onSurfaceVariantText),
-            selectedIcon: Icon(Icons.shopping_cart, color: AppColors.industrialOrange),
-            label: 'Rewards',
+            icon: Icon(Icons.ad_units_outlined, color: AppColors.onSurfaceVariantText),
+            selectedIcon: Icon(Icons.ad_units, color: AppColors.industrialOrange),
+            label: 'AdMob Hub',
           ),
         ],
       ),

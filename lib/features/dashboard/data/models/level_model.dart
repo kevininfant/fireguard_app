@@ -55,15 +55,40 @@ class LevelModel extends Equatable {
     };
   }
 
-  factory LevelModel.fromJson(Map<String, dynamic> json) {
+  factory LevelModel.fromJson(Map<String, dynamic> json, [String? docId]) {
+    final rawLevelId = json['levelId'] ?? json['level_id'] ?? json['levelNumber'] ?? json['level_number'];
+    final parsedLevelId = rawLevelId is int
+        ? rawLevelId
+        : (int.tryParse(rawLevelId?.toString() ?? '') ?? (int.tryParse(docId ?? '') ?? 1));
+
+    final rawLevelNum = json['levelNumber'] ?? json['level_number'];
+    final parsedLevelNum = rawLevelNum is int
+        ? rawLevelNum
+        : (int.tryParse(rawLevelNum?.toString() ?? '') ?? parsedLevelId);
+
+    final rawPoints = json['pointsRequired'] ?? json['requiredPoints'] ?? json['required_points'] ?? json['points'];
+    final parsedPoints = rawPoints is int
+        ? rawPoints
+        : (int.tryParse(rawPoints?.toString() ?? '') ?? 0);
+
+    final rawScore = json['scorePts'] ?? json['score_pts'];
+    final parsedScore = rawScore is int
+        ? rawScore
+        : (int.tryParse(rawScore?.toString() ?? '') ?? 0);
+
+    final targetStd = json['targetStandard']?.toString();
+    final subtitleText = json['subtitle']?.toString() ??
+        json['description']?.toString() ??
+        (targetStd != null && targetStd.isNotEmpty ? 'Standard: $targetStd' : 'Industrial workplace safety module');
+
     return LevelModel(
-      levelId: json['levelId'] ?? json['level_number'] ?? 1,
-      levelNumber: json['levelNumber'] ?? json['level_number'] ?? 1,
-      title: json['title'] ?? 'Level 1: Basic Safety',
-      subtitle: json['subtitle'] ?? 'PASS Extinguisher & Hazard Spotting',
-      requiredPoints: json['requiredPoints'] ?? json['required_points'] ?? 0,
-      status: json['status'] ?? 'ACTIVE',
-      scorePts: json['scorePts'] ?? json['score_pts'] ?? 0,
+      levelId: parsedLevelId,
+      levelNumber: parsedLevelNum,
+      title: json['title'] ?? 'Level $parsedLevelNum: Safety Drill',
+      subtitle: subtitleText,
+      requiredPoints: parsedPoints,
+      status: (json['status'] ?? (parsedLevelNum == 1 ? 'ACTIVE' : 'LOCKED')).toString().toUpperCase(),
+      scorePts: parsedScore,
     );
   }
 
